@@ -8,6 +8,7 @@ set showcmd
 
 " displaying
 syntax on
+set termguicolors
 colorscheme xxx
 set guifont=Monospace\ 12
 
@@ -17,6 +18,12 @@ inoremap jk <esc>
 " adjust theme
 hi Comment ctermbg=darkgray
 hi Comment ctermfg=lightblue
+" the color below the last line of file
+hi NonText guibg=#000000
+" function name
+hi Identifier guifg=#00BFBF
+" string
+hi Constant guifg=#FF0000
 
 " for coding
 autocmd FileType python set expandtab
