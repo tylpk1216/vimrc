@@ -10,6 +10,7 @@ set backspace=indent,eol,start
 " ------------ displaying ------------
 syntax on
 set termguicolors
+set hlsearch
 colorscheme desert
 
 if has('unix')
