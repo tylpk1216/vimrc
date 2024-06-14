@@ -1,4 +1,4 @@
-" general settings
+" ------------ general settings ------------
 set tabstop=4
 set nu
 set ai
@@ -7,16 +7,19 @@ set showcmd
 set backspace=indent,eol,start
 "set mouse=a
 
-" displaying
+" ------------ displaying ------------
 syntax on
 set termguicolors
 colorscheme desert
 
 if has('unix')
-	set guifont=Monospace\ 12
+    set guifont=Monospace\ 12
 else
-	set guifont=Courier_New:h18
+    set guifont=Courier_New:h18
 endif
+
+" max gui window
+au GUIEnter * simalt ~x
 
 " re-map key
 inoremap jk <esc>
@@ -39,5 +42,5 @@ hi Type guifg=#008888
 " \n
 hi Special guifg=#FF0000
 
-" for coding
+" ------------ for coding ------------
 autocmd FileType python setlocal shiftwidth=4 softtabstop=4 expandtab
