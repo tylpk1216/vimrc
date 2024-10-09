@@ -28,6 +28,8 @@ inoremap jk <esc>
 " adjust theme (ctermbg/guibg)
 hi Comment guibg=#808080
 hi Comment guifg=#0000A0 gui=bold
+" normal text/backgound
+hi Normal guifg=#ffffff guibg=#000000
 " the color below the last line of file
 hi NonText guibg=#000000
 " function name
