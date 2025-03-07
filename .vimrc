@@ -25,9 +25,18 @@ au GUIEnter * simalt ~x
 " re-map key
 inoremap jk <esc>
 
+" status line
+set laststatus=2
+set statusline=%F\ %=%y[Col:%v][Row:%l/%L]
+
 " adjust theme (ctermbg/guibg)
 hi Comment guibg=#808080
 hi Comment guifg=#0000A0 gui=bold
+
+" status line
+hi StatusLine guibg=#808080
+hi StatusLine guifg=#0000A0 gui=bold
+
 " normal text/backgound
 hi Normal guifg=#ffffff guibg=#000000
 " the color below the last line of file
