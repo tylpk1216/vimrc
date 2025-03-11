@@ -23,7 +23,18 @@ endif
 au GUIEnter * simalt ~x
 
 " re-map key
+let mapleader = ","
 inoremap jk <esc>
+
+if has('unix')
+    nnoremap cmd:silent !gnome-terminal &<CR>
+else
+    nnoremap cmd:silent !"C:\ProgramFiles\Git\bin\bash.exe"<CR><CR>
+endif
+
+nnoremap <leader>ev :vsplit $MYVIMRC<CR> 
+nnoremap <leader>n <C-f>
+nnoremap <leader>m <C-b>
 
 " status line
 set laststatus=2
