@@ -66,9 +66,12 @@ hi Type guifg=#008888
 hi Special guifg=#FF0000
 
 " ------------ for coding ------------
-autocmd FileType python setlocal shiftwidth=4 softtabstop=4 expandtab
-autocmd BufWritePost *.vimrc source %
-autocmd BufWritePre * silent! :%s/\v\s+$//g
+augroup coding_group
+    autocmd!
+    autocmd FileType python setlocal shiftwidth=4 softtabstop=4 expandtab
+    autocmd BufWritePost *.vimrc source %
+    autocmd BufWritePre * silent! :%s/\v\s+$//g
+augroup END
 
 " for tmux
 if exists('+termguicolors')
