@@ -35,6 +35,7 @@ endif
 nnoremap <leader>ev :vsplit $MYVIMRC<CR> 
 nnoremap <leader>n <C-f>
 nnoremap <leader>m <C-b>
+nnoremap <leader>sh :set syntax=sh<CR>
 
 " status line
 set laststatus=2
