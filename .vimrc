@@ -37,7 +37,10 @@ nnoremap <leader>n <C-f>
 nnoremap <leader>m <C-b>
 nnoremap <leader>sh :set syntax=sh<CR>
 nnoremap <leader>gf <C-w>gf
-nnoremap <leader>module <S-v>/endmodule<CR>y :tabe a.v<CR>p
+" select, search word
+nnoremap <leader>sw viw y
+nnoremap <leader>fw viw y /<C-r><S-"><CR>
+nnoremap <leader>module <S-v>/endmodule<CR>y :call OpenModuleFile()<CR>
 
 " status line
 set laststatus=2
@@ -83,3 +86,13 @@ if exists('+termguicolors')
     set termguicolors
 endif
 
+" ------------ functions  ------------
+function OpenModuleFile()
+    let l:strs = split(getline("."))
+    let l:fname = "tmp"
+    if len(l:strs) > 3 
+        let l:fname = l:strs[1]
+    endif
+    execute ":tabe " . l:fname . ".v"
+    normal! p
+endfunction
