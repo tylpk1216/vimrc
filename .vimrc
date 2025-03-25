@@ -89,14 +89,14 @@ endif
 " ------------ functions  ------------
 function OpenModuleFile()
     let l:line = substitute(getline("."), "(", " ", "")
-	let l:strs = split(l:line)
+    let l:strs = split(l:line)
 
-	let l:fname = "tmp"
-	if len(l:strs) >= 2
-		let l:fname = strs[1]
-	endif
+    let l:fname = "tmp"
+    if len(l:strs) >= 2
+        let l:fname = strs[1]
+    endif
 
-	execute ":tabe " . l:fname . ".v"
-	normal! p
-	execute ":set syntax=verilog"
+    execute ":tabe " . l:fname . ".v"
+    normal! p
+    execute ":set syntax=verilog"
 endfunction
