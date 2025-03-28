@@ -41,6 +41,8 @@ nnoremap <leader>gf <C-w>gf
 nnoremap <leader>sw viw y
 nnoremap <leader>fw viw y /<C-r><S-"><CR>
 nnoremap <leader>module <S-v>/endmodule<CR>y :call OpenModuleFile()<CR>
+nnoremap <leader>cc :call SetColorColumn()<CR>
+nnoremap <leader>dc :set colorcolumn=0<CR>
 
 " status line
 set laststatus=2
@@ -99,4 +101,9 @@ function OpenModuleFile()
     execute ":tabe " . l:fname . ".v"
     normal! p
     execute ":set syntax=verilog"
+endfunction
+
+function SetColorColumn()
+    let l:cursor = getops(".")
+    execute ":set colorcolumn=" . l:cursor[2]
 endfunction
