@@ -1,3 +1,9 @@
+" ------------ global variables ------------
+let g:netrw_keepdir = 0
+let g:netrw_banner = 0
+let g:netrw_winsize = 30
+let g:netrw_browse_split = 3
+
 " ------------ general settings ------------
 set tabstop=4
 set nu
@@ -43,6 +49,7 @@ nnoremap <leader>fw viw y /<C-r><S-"><CR>
 nnoremap <leader>module <S-v>/endmodule<CR>y :call OpenModuleFile()<CR>
 nnoremap <leader>cc :call SetColorColumn()<CR>
 nnoremap <leader>dc :set colorcolumn=0<CR>
+nnoremap <leader>fm :Vex
 
 " status line
 set laststatus=2
@@ -106,4 +113,9 @@ endfunction
 function SetColorColumn()
     let l:cursor = getops(".")
     execute ":set colorcolumn=" . l:cursor[2]
+endfunction
+
+function GetCurrNetrwFile()
+	let l:s = expand("%:p") . getline(".")
+	echo l:s
 endfunction
