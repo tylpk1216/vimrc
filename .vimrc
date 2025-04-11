@@ -80,6 +80,11 @@ hi Type guifg=#008888
 " \n
 hi Special guifg=#FF0000
 
+" netrw                        
+hi MKExe ctermfg=lightgreen    
+hi Directory ctermfg=lightblue
+hi link netrwExe MKExe 
+
 " ------------ for coding ------------
 augroup coding_group
     autocmd!
