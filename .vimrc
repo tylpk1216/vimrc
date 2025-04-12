@@ -1,7 +1,7 @@
 " ------------ global variables ------------
 let g:netrw_keepdir = 0
 let g:netrw_banner = 0
-let g:netrw_winsize = 30
+let g:netrw_winsize = 25
 let g:netrw_browse_split = 3
 
 " ------------ general settings ------------
@@ -49,11 +49,10 @@ nnoremap <leader>fw viw y /<C-r><S-"><CR>
 nnoremap <leader>module <S-v>/endmodule<CR>y :call OpenModuleFile()<CR>
 nnoremap <leader>cc :call SetColorColumn()<CR>
 nnoremap <leader>dc :set colorcolumn=0<CR>
-nnoremap <leader>fm :Vex
+nnoremap <leader>fm :Vex<CR>
 
 " status line
 set laststatus=2
-set statusline=%F\ %=%y[Col:%v][Row:%l/%L]
 
 " adjust theme (ctermbg/guibg)
 hi Comment guibg=#808080
@@ -121,6 +120,12 @@ function SetColorColumn()
 endfunction
 
 function GetCurrNetrwFile()
-	let l:s = expand("%:p") . getline(".")
-	echo l:s
+    let l:s = expand("%:p") . getline(".")
+    echo l:s
+endfunction
+
+function SetStatusLine()
+    if &ft == "netrw"
+	execute ":set statusline=%F\\" . " %=%y[Col:%v][Row:%l/%L]e " 	
+    endif
 endfunction
