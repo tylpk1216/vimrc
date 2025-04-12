@@ -39,7 +39,7 @@ else
     nnoremap cmd:silent !"C:\ProgramFiles\Git\bin\bash.exe"<CR><CR>
 endif
 
-nnnoremap t '
+nnoremap t '
 nnoremap <leader>ev :vsplit $MYVIMRC<CR>
 nnoremap <leader>n <C-f>
 nnoremap <leader>m <C-b>
