@@ -1,4 +1,4 @@
-" ------------ global variables ------------
+/" ------------ global variables ------------
 let g:netrw_keepdir = 0
 let g:netrw_banner = 0
 let g:netrw_winsize = 25
@@ -38,7 +38,7 @@ else
     nnoremap cmd:silent !"C:\ProgramFiles\Git\bin\bash.exe"<CR><CR>
 endif
 
-nnoremap <leader>ev :vsplit $MYVIMRC<CR> 
+nnoremap <leader>ev :vsplit $MYVIMRC<CR>
 nnoremap <leader>n <C-f>
 nnoremap <leader>m <C-b>
 nnoremap <leader>sh :set syntax=sh<CR>
@@ -79,17 +79,21 @@ hi Type guifg=#008888
 " \n
 hi Special guifg=#FF0000
 
-" netrw                        
-hi MKExe ctermfg=lightgreen    
-hi Directory ctermfg=lightblue
-hi link netrwExe MKExe 
+" netrw
+hi MKExe guifg=lightgreen
+hi Directory guifg=lightblue
+hi link netrwExe MKExe
 
 " ------------ for coding ------------
 augroup coding_group
     autocmd!
     autocmd FileType python setlocal shiftwidth=4 softtabstop=4 expandtab
+    autocmd FileType tcl setlocal shiftwidth=4 softtabstop=4 expandtab
+    autocmd FileType sh setlocal shiftwidth=4 softtabstop=4 expandtab
+    autocmd FileType netrw set statusline=%F
+    autocmd FileType * call SetStatusLine()
     autocmd BufWritePost *.vimrc source %
-    autocmd BufWritePre * silent! :%s/\v\s+$//g
+    autocmd BufWritePre .py,.sh,.tcl silent! :%s/\v\s+$//g
 augroup END
 
 " for tmux
@@ -125,8 +129,8 @@ function GetCurrNetrwFile()
 endfunction
 
 function SetStatusLine()
-    if &ft == "netrw"
-	execute ":set statusline=%F\\" . " %=%y[Col:%v][Row:%l/%L]e " 	
+    if &ft != "netrw"
+        execute ":set statusline=%F\\" . " %=%y[Col:%v][Row:%l/%L]"
     endif
 endfunction
 execute SetStatusLine()
