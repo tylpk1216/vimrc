@@ -11,6 +11,7 @@ set ai
 set title
 set showcmd
 set backspace=indent,eol,start
+set splitright
 "set mouse=a
 
 " ------------ displaying ------------
@@ -50,6 +51,7 @@ nnoremap <leader>module <S-v>/endmodule<CR>y :call OpenModuleFile()<CR>
 nnoremap <leader>cc :call SetColorColumn()<CR>
 nnoremap <leader>dc :set colorcolumn=0<CR>
 nnoremap <leader>fm :Vex<CR>
+nnoremap <leader>o :call OpenFileToRight()<CR>
 
 " status line
 set laststatus=2
@@ -134,3 +136,8 @@ function SetStatusLine()
     endif
 endfunction
 execute SetStatusLine()
+
+function ()
+    let l:s = GetCurrNetrwFile()
+	execute ":vsplit " . l:s
+endfunction
