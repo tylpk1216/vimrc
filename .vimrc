@@ -119,7 +119,7 @@ function OpenModuleFile()
 endfunction
 
 function SetColorColumn()
-    let l:cursor = getops(".")
+    let l:cursor = getpos(".")
     execute ":set colorcolumn=" . l:cursor[2]
 endfunction
 
