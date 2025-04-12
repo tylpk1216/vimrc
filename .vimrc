@@ -129,3 +129,4 @@ function SetStatusLine()
 	execute ":set statusline=%F\\" . " %=%y[Col:%v][Row:%l/%L]e " 	
     endif
 endfunction
+execute SetStatusLine()
