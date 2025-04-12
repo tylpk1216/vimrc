@@ -45,8 +45,8 @@ nnoremap <leader>m <C-b>
 nnoremap <leader>sh :set syntax=sh<CR>
 nnoremap <leader>gf <C-w>gf
 " select, search word
-nnoremap <leader>sw viw y
-nnoremap <leader>fw viw y /<C-r><S-"><CR>
+nnoremap <leader>sw viwy
+nnoremap <leader>fw viwy /<C-r><S-"><CR>
 nnoremap <leader>module <S-v>/endmodule<CR>y :call OpenModuleFile()<CR>
 nnoremap <leader>cc :call SetColorColumn()<CR>
 nnoremap <leader>dc :set colorcolumn=0<CR>
