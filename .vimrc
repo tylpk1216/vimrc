@@ -122,7 +122,7 @@ endif
 augroup coding_group
     autocmd!
     autocmd FileType python,tcl,sh setlocal shiftwidth=4 softtabstop=4 expandtab
-    autocmd FileType ~/.vimrc setlocal shiftwidth=4 softtabstop=4 expandtab
+    autocmd FileType vim setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType netrw set statusline=%F
     autocmd FileType * call SetStatusLine()
     autocmd BufWritePost *.vimrc source %
@@ -172,6 +172,6 @@ execute SetStatusLine()
 function OpenFileToRight()
     let l:s = GetCurrNetrwFile()
     execute ":vsplit " . l:s
-	execute ":normal! 100\<C-W>|\<CR>"
+    execute ":normal! 100\<C-W>|\<CR>"
 endfunction
 
