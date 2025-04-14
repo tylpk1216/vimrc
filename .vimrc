@@ -1,4 +1,4 @@
-/" ------------ global variables ------------
+" ------------ global variables ------------
 let g:netrw_keepdir = 0
 let g:netrw_banner = 0
 let g:netrw_winsize = 25
@@ -16,13 +16,13 @@ set splitright
 
 " ------------ displaying ------------
 syntax on
-set termguicolors
 set hlsearch
 colorscheme desert
 
 if has('unix')
     set guifont=Monospace\ 12
 else
+    set termguicolors
     set guifont=Courier_New:h18
 endif
 
@@ -58,34 +58,61 @@ nnoremap <leader>o :call OpenFileToRight()<CR>
 set laststatus=2
 
 " adjust theme (ctermbg/guibg)
-hi Comment guibg=#808080
-hi Comment guifg=#0000A0 gui=bold
+if has('unix')
+    hi Comment ctermbg=lightgray
+    hi Comment ctermfg=black cterm=bold
 
-" status line
-hi StatusLine guibg=#808080
-hi StatusLine guifg=#0000A0 gui=bold
+    hi StatusLine ctermbg=lightgray
+    hi StatusLine ctermfg=black cterm=bold
 
-" normal text/backgound
-hi Normal guifg=#ffffff guibg=#000000
-" the color below the last line of file
-hi NonText guibg=#000000
-" function name
-hi Identifier guifg=white
-" string
-hi Constant guifg=#FF0000
-" #include
-hi PreProc guifg=#008888
-" return, if, else
-hi Statement guifg=#008888
-" int, void
-hi Type guifg=#008888
-" \n
-hi Special guifg=#FF0000
+    " function name
+    hi Identifier ctermfg=white
 
-" netrw
-hi MKExe guifg=lightgreen
-hi Directory guifg=lightblue
-hi link netrwExe MKExe
+    " #include
+    hi PreProc ctermfg=darkcyan
+    hi Statement ctermfg=darkcyan
+    hi Constant ctermfg=red
+    " int, void
+    hi Type ctermfg=darkcyan
+    hi Special ctermfg=lightblue
+
+    hi Search ctermbg=darkgreen
+    hi Search ctermfg=white
+
+    " netrw
+    hi MKExe ctermfg=lightgreen
+    hi Directory ctermfg=lightblue
+    hi link netrwExe MKExe
+else
+    hi Comment guibg=#808080
+    hi Comment guifg=#0000A0 gui=bold
+
+    " status line
+    hi StatusLine guibg=#808080
+    hi StatusLine guifg=#0000A0 gui=bold
+
+    " normal text/backgound
+    hi Normal guifg=#ffffff guibg=#000000
+    " the color below the last line of file
+    hi NonText guibg=#000000
+    " function name
+    hi Identifier guifg=white
+    " string
+    hi Constant guifg=#FF0000
+    " #include
+    hi PreProc guifg=#008888
+    " return, if, else
+    hi Statement guifg=#008888
+    " int, void
+    hi Type guifg=#008888
+    " \n
+    hi Special guifg=#FF0000
+
+    " netrw
+    hi MKExe guifg=#00FFFF
+    hi Directory guifg=#18FFFF
+    hi link netrwExe MKExe
+endif
 
 " ------------ for coding ------------
 augroup coding_group
@@ -93,6 +120,7 @@ augroup coding_group
     autocmd FileType python setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType tcl setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType sh setlocal shiftwidth=4 softtabstop=4 expandtab
+    autocmd FileType ~/.vimrc setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType netrw set statusline=%F
     autocmd FileType * call SetStatusLine()
     autocmd BufWritePost *.vimrc source %
@@ -140,5 +168,5 @@ execute SetStatusLine()
 
 function OpenFileToRight()
     let l:s = GetCurrNetrwFile()
-	execute ":vsplit " . l:s
+    execute ":vsplit " . l:s
 endfunction
