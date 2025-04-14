@@ -4,6 +4,7 @@ let g:netrw_banner = 0
 let g:netrw_winsize = 25
 let g:netrw_browse_split = 3
 
+
 " ------------ general settings ------------
 set tabstop=4
 set nu
@@ -14,22 +15,8 @@ set backspace=indent,eol,start
 set splitright
 "set mouse=a
 
-" ------------ displaying ------------
-syntax on
-set hlsearch
-colorscheme desert
 
-if has('unix')
-    set guifont=Monospace\ 12
-else
-    set termguicolors
-    set guifont=Courier_New:h18
-endif
-
-" max gui window
-au GUIEnter * simalt ~x
-
-" re-map key
+" ------------ re-map keys ------------
 let mapleader = ","
 inoremap jk <esc>
 
@@ -53,6 +40,22 @@ nnoremap <leader>cc :call SetColorColumn()<CR>
 nnoremap <leader>dc :set colorcolumn=0<CR>
 nnoremap <leader>fm :Vex<CR>
 nnoremap <leader>o :call OpenFileToRight()<CR>
+
+
+" ------------ displaying ------------
+syntax on
+set hlsearch
+colorscheme desert
+
+if has('unix')
+    set guifont=Monospace\ 12
+else
+    set termguicolors
+    set guifont=Courier_New:h18
+endif
+
+" max gui window
+au GUIEnter * simalt ~x
 
 " status line
 set laststatus=2
@@ -109,17 +112,16 @@ else
     hi Special guifg=#FF0000
 
     " netrw
-    hi MKExe guifg=#00FFFF
-    hi Directory guifg=#18FFFF
+    hi MKExe guifg=lightgreen
+    hi Directory guifg=#00FFFF
     hi link netrwExe MKExe
 endif
+
 
 " ------------ for coding ------------
 augroup coding_group
     autocmd!
-    autocmd FileType python setlocal shiftwidth=4 softtabstop=4 expandtab
-    autocmd FileType tcl setlocal shiftwidth=4 softtabstop=4 expandtab
-    autocmd FileType sh setlocal shiftwidth=4 softtabstop=4 expandtab
+    autocmd FileType python,tcl,sh setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType ~/.vimrc setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType netrw set statusline=%F
     autocmd FileType * call SetStatusLine()
@@ -133,6 +135,7 @@ if exists('+termguicolors')
     let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
     set termguicolors
 endif
+
 
 " ------------ functions  ------------
 function OpenModuleFile()
@@ -169,5 +172,6 @@ execute SetStatusLine()
 function OpenFileToRight()
     let l:s = GetCurrNetrwFile()
     execute ":vsplit " . l:s
-    execute "normal! 100\<C-W>|\<CR>"
+	execute ":normal! 100\<C-W>|\<CR>"
 endfunction
+
