@@ -128,7 +128,7 @@ endfunction
 
 function GetCurrNetrwFile()
     let l:s = expand("%:p") . getline(".")
-    echo l:s
+    return l:s
 endfunction
 
 function SetStatusLine()
@@ -138,7 +138,7 @@ function SetStatusLine()
 endfunction
 execute SetStatusLine()
 
-function ()
+function OpenFileToRight()
     let l:s = GetCurrNetrwFile()
 	execute ":vsplit " . l:s
 endfunction
