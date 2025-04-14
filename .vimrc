@@ -169,4 +169,5 @@ execute SetStatusLine()
 function OpenFileToRight()
     let l:s = GetCurrNetrwFile()
     execute ":vsplit " . l:s
+    execute "normal! 100\<C-W>|\<CR>"
 endfunction
