@@ -30,7 +30,7 @@ else
 endif
 
 nnoremap t '
-nnoremap <leader>ev :vsplit $MYVIMRC<CR>
+nnoremap <leader>ev :call OpenFileToRight($MYVIMRC)<CR>
 nnoremap <leader>n <C-f>
 nnoremap <leader>m <C-b>
 nnoremap <leader>sh :set syntax=sh<CR>
@@ -42,7 +42,7 @@ nnoremap <leader>module <S-v>/endmodule<CR>y :call OpenModuleFile()<CR>
 nnoremap <leader>cc :call SetColorColumn()<CR>
 nnoremap <leader>dc :set colorcolumn=0<CR>
 nnoremap <leader>fm :Vex<CR>
-nnoremap <leader>o :call OpenFileToRight()<CR>
+nnoremap <leader>o :call OpenFileToRight(GetCurrNetrwFile())<CR>
 
 
 " ------------ displaying ------------
@@ -116,7 +116,7 @@ else
 
     " netrw
     hi MKExe guifg=lightgreen
-    hi Directory guifg=#00FFFF
+    hi Directory guifg=#79C0FF gui=bold
     hi link netrwExe MKExe
 endif
 
@@ -167,7 +167,7 @@ endfunction
 
 function! SetStatusLine()
     if &ft != "netrw"
-        execute ":set statusline=%F\\" . " %=%y[Col:%v][Row:%l/%L]"
+        execute ":set statusline=%F\\ %=%y[Col:%v][Row:%l/%L]"
     endif
 endfunction
 execute SetStatusLine()
@@ -192,12 +192,11 @@ function! GetWinWidth()
     endif
 endfunction
 
-function! OpenFileToRight()
+function! OpenFileToRight(curr_file)
     if g:MK_set_winwidth == 0
         call GetWinWidth()
     endif
 
-    let l:s = GetCurrNetrwFile()
-    execute ":vsplit " . l:s
+    execute ":vsplit " . a:curr_file
     execute ":normal! " . g:MK_winwidth . "\<C-W>|\<CR>"
 endfunction
