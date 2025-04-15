@@ -4,6 +4,9 @@ let g:netrw_banner = 0
 let g:netrw_winsize = 25
 let g:netrw_browse_split = 3
 
+let g:MK_set_winwidth = 0
+let g:MK_winwidth = 100
+
 
 " ------------ general settings ------------
 set tabstop=4
@@ -61,7 +64,7 @@ au GUIEnter * simalt ~x
 set laststatus=2
 
 " adjust theme (ctermbg/guibg)
-if has('unix')
+if has('unix') && !has('win32unix')
     hi Comment ctermbg=lightgray
     hi Comment ctermfg=black cterm=bold
 
@@ -138,7 +141,7 @@ endif
 
 
 " ------------ functions  ------------
-function OpenModuleFile()
+function! OpenModuleFile()
     let l:line = substitute(getline("."), "(", " ", "")
     let l:strs = split(l:line)
 
@@ -152,26 +155,49 @@ function OpenModuleFile()
     execute ":set syntax=verilog"
 endfunction
 
-function SetColorColumn()
+function! SetColorColumn()
     let l:cursor = getpos(".")
     execute ":set colorcolumn=" . l:cursor[2]
 endfunction
 
-function GetCurrNetrwFile()
+function! GetCurrNetrwFile()
     let l:s = expand("%:p") . getline(".")
     return l:s
 endfunction
 
-function SetStatusLine()
+function! SetStatusLine()
     if &ft != "netrw"
         execute ":set statusline=%F\\" . " %=%y[Col:%v][Row:%l/%L]"
     endif
 endfunction
 execute SetStatusLine()
 
-function OpenFileToRight()
-    let l:s = GetCurrNetrwFile()
-    execute ":vsplit " . l:s
-    execute ":normal! 100\<C-W>|\<CR>"
+function! GetWinWidth()
+    if g:MK_set_winwidth == 1
+        return
+    endif
+
+    let g:MK_set_winwidth = 1
+
+    let l:count = winnr("$")
+    let l:n = 0
+    let l:i = 0
+    while l:i < l:count
+        let l:n += winwidth(l:i)
+        let l:i += 1
+    endwhile
+
+    if l:n > 0
+        let g:MK_winwidth = float2nr(l:n * 0.75)
+    endif
 endfunction
 
+function! OpenFileToRight()
+    if g:MK_set_winwidth == 0
+        call GetWinWidth()
+    endif
+
+    let l:s = GetCurrNetrwFile()
+    execute ":vsplit " . l:s
+    execute ":normal! " . g:MK_winwidth . "\<C-W>|\<CR>"
+endfunction
