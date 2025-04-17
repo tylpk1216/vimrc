@@ -4,8 +4,6 @@ let g:netrw_banner = 0
 let g:netrw_winsize = 25
 let g:netrw_browse_split = 3
 
-let s:MK_set_winwidth = 0
-let s:MK_winwidth = 100
 " use it to prevent from losing cursor when netrw open tab and quit.
 let s:MK_restore_count = 0
 
@@ -43,7 +41,7 @@ syntax on
 set hlsearch
 colorscheme desert
 
-if has('unix')
+if has("unix")
     set guifont=Monospace\ 12
 else
     set termguicolors
@@ -57,7 +55,7 @@ au GUIEnter * simalt ~x
 set laststatus=2
 
 " adjust theme (ctermbg/guibg)
-if has('unix') && !has('win32unix')
+if has("unix") && !has("win32unix")
     hi Comment ctermbg=lightgray
     hi Comment ctermfg=black cterm=bold
 
@@ -120,16 +118,16 @@ augroup coding_group
     autocmd FileType python,tcl,sh setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType vim setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType netrw set statusline=%F
-    autocmd FileType * call <SID>SetStatusLine()
+    autocmd FileType * call s:SetStatusLine()
     autocmd BufWritePost *.vimrc source %
     autocmd BufWritePre .py,.sh,.tcl silent! :%s/\v\s+$//g
     " it is not a good event. However, I can't find the right event now.
     " only windows gvim needs it.
-    autocmd Vimresized * call <SID>BackToNetrwWindow()
+    autocmd Vimresized * call s:BackToNetrwWindow()
 augroup END
 
 " for tmux
-if exists('+termguicolors')
+if exists("+termguicolors")
     let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
     let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
     set termguicolors
@@ -161,19 +159,17 @@ function! <SID>GetCurrNetrwFile()
     return l:s
 endfunction
 
-function! <SID>SetStatusLine()
+function! s:SetStatusLine()
     if &ft != "netrw"
         execute ":set statusline=%F\\ %=%y[Col:%v][Row:%l/%L]"
     endif
 endfunction
-execute <SID>SetStatusLine()
+execute s:SetStatusLine()
 
-function! <SID>GetWinWidth()
-    if s:MK_set_winwidth == 1
+function! s:GetWinWidth()
+    if has("s:MK_winwidth")
         return
     endif
-
-    let s:MK_set_winwidth = 1
 
     let l:count = winnr("$")
     let l:n = 0
@@ -189,12 +185,12 @@ function! <SID>GetWinWidth()
 endfunction
 
 function! <SID>OpenFileToRight(curr_file)
-    if s:MK_set_winwidth == 0
-        call <SID>GetWinWidth()
+    if !has("s:MK_winwidth")
+        call s:GetWinWidth()
     endif
     
     " prevent from opening window many times.
-    if !exists('s:MK_sv')
+    if !exists("s:MK_sv")
         let s:MK_sv = winsaveview()
     endif
 
@@ -202,8 +198,8 @@ function! <SID>OpenFileToRight(curr_file)
     execute ":normal! " . s:MK_winwidth . "\<C-W>|\<CR>"
 endfunction
 
-function! <SID>BackToNetrwWindow()
-    if !exists('s:MK_sv') || has('unix')
+function! s:BackToNetrwWindow()
+    if !exists("s:MK_sv") || has("unix")
         return
     endif
     
