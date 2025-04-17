@@ -124,7 +124,7 @@ augroup coding_group
     autocmd BufWritePost *.vimrc source %
     autocmd BufWritePre .py,.sh,.tcl silent! :%s/\v\s+$//g
     " it is not a good event. However, I can't find the right event now.
-    " only windos gvim needs.
+    " only windows gvim needs it.
     autocmd Vimresized * call <SID>BackToNetrwWindow()
 augroup END
 
@@ -193,14 +193,23 @@ function! <SID>OpenFileToRight(curr_file)
         call <SID>GetWinWidth()
     endif
     
-    let s:MK_sv = winsaveview()
-    
+    " prevent from opening window many times.
+    if !exists('s:MK_sv')
+        let s:MK_sv = winsaveview()
+    endif
+
     execute ":vsplit " . a:curr_file
     execute ":normal! " . s:MK_winwidth . "\<C-W>|\<CR>"
 endfunction
 
 function! <SID>BackToNetrwWindow()
     if !exists('s:MK_sv') || has('unix')
+        return
+    endif
+    
+    " prevent from opening window many times.
+    let l:count = winnr("$")
+    if l:count != 1 && l:count != 2
         return
     endif
     
