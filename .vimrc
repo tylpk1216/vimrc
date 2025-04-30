@@ -3,6 +3,7 @@ let g:netrw_keepdir = 0
 let g:netrw_banner = 0
 let g:netrw_winsize = 25
 let g:netrw_browse_split = 3
+set guioptions-=L
 
 " use it to prevent from losing cursor when netrw open tab and quit.
 let s:MK_restore_count = 0
@@ -29,12 +30,14 @@ nnoremap <leader>sh :set syntax=sh<CR>
 nnoremap <leader>gf <C-w>gf
 " select, search word
 nnoremap <leader>fw viwy /<C-r><S-"><CR>
-nnoremap <leader>module <S-v>/endmodule<CR>y :call <SID>OpenModuleFile()<CR>
+nnoremap <leader>mo <S-v>/endmodule<CR>y :call <SID>OpenModuleFile()<CR>
 nnoremap <leader>cc :call <SID>SetColorColumn()<CR>
 nnoremap <leader>dc :set colorcolumn=0<CR>
 nnoremap <leader>fm :Vex<CR>
 nnoremap <leader>o :call <SID>OpenFileToRight(<SID>GetCurrNetrwFile())<CR>
-
+nnoremap <leader>h gT
+nnoremap <leader>l gt
+nnoremap nn nzt
 
 " ------------ displaying ------------
 syntax on
@@ -105,6 +108,8 @@ else
     " \n
     hi Special guifg=#FF0000
 
+    hi TabLineSet guifg=red
+
     " netrw
     hi MKExe guifg=lightgreen
     hi Directory guifg=#79C0FF gui=bold
@@ -117,13 +122,15 @@ augroup coding_group
     autocmd!
     autocmd FileType python,tcl,sh setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType vim setlocal shiftwidth=4 softtabstop=4 expandtab
-    autocmd FileType netrw set statusline=%F
+    autocmd FileType go setlocal shiftwidth=4 softtabstop=4
+    "autocmd FileType netrw set statusline=%F
     autocmd FileType * call s:SetStatusLine()
     autocmd BufWritePost *.vimrc source %
-    autocmd BufWritePre .py,.sh,.tcl silent! :%s/\v\s+$//g
+    autocmd BufWritePre .py,.sh,.tcl,.go silent! :%s/\v\s+$//g
     " it is not a good event. However, I can't find the right event now.
     " only windows gvim needs it.
     autocmd Vimresized * call s:BackToNetrwWindow()
+    "autocmd BufEnter * call s:MK_Browse("")
 augroup END
 
 " for tmux
@@ -144,6 +151,10 @@ function! <SID>OpenModuleFile()
         let l:fname = strs[1]
     endif
 
+    if filereadable(l:fname . ".v") == 1
+        let l:fname = l:fname . "_"
+    endif
+
     execute ":tabe " . l:fname . ".v"
     normal! p
     execute ":set syntax=verilog"
@@ -161,7 +172,7 @@ endfunction
 
 function! s:SetStatusLine()
     if &ft != "netrw"
-        execute ":set statusline=%F\\ %=%y[Col:%v][Row:%l/%L]"
+        execute ":set statusline=%f\\ %=%y[Col:%v][Row:%l/%L]"
     endif
 endfunction
 execute s:SetStatusLine()
@@ -193,12 +204,15 @@ function! <SID>OpenFileToRight(curr_file)
     if !exists("s:MK_sv")
         let s:MK_sv = winsaveview()
     endif
+    
+    let g:MK_sv = winsaveview()
 
     execute ":vsplit " . a:curr_file
     execute ":normal! " . s:MK_winwidth . "\<C-W>|\<CR>"
 endfunction
 
 function! s:BackToNetrwWindow()
+    "echom "BackToNetrwWindow"
     if !exists("s:MK_sv") || has("unix")
         return
     endif
@@ -218,3 +232,83 @@ function! s:BackToNetrwWindow()
     endif
 endfunction
 
+"autocmd FileType netrw nnoremap :q :q!
+"autocmd FileType netrw nnoremap <CR> :call <SID>MK_Enter_Browse(<SID>GetCurrNetrwFile())<CR>
+
+function! <SID>MK_Enter_Browse(name)
+    echom a:name
+    if isdirectory(a:name)
+        let dir = a:name
+        if has('win32')
+            let dir = substitute(dir, "/", "\\", "")        
+        endif
+        
+        call chdir(dir)
+        call s:MK_Browse(dir)
+    else
+        let g:MK_sv = winsaveview()
+        execute ":tabe " . a:name
+    endif
+endfunction
+
+function! s:MK_Browse(dir)
+    let curr = expand("%:p")
+    if a:dir != ""
+        let curr = a:dir
+    endif
+
+    if !isdirectory(curr)
+        execute ":set nocursorline"
+        return
+    endif
+    
+    if getcwd() != curr
+        call chdir(curr)
+    endif
+
+    execute ":set filetype=netrw"
+    execute ":setlocal nonumber"
+    execute ":setlocal nowrap"
+    execute ":setlocal cursorline"
+    "execute ":setlocal buftype=nofile"
+    
+    normal! dG
+
+    let f_list = readdir(curr, 1)
+    let n = 1
+
+    let files = []
+    let folders = []
+
+    call add(folders, "../")
+    call add(folders, "./")
+
+    for f in f_list
+        if f == ".swp" || f == "_.swp"
+            continue
+        endif
+
+        let s = f
+        if isdirectory(f)
+            let s = s . "/"
+            call add(folders, s)
+        else
+            call add(files, s)
+        endif
+    endfor
+
+    for f in folders
+        call setline(n, f)
+        let n = n + 1
+    endfor
+    
+    for f in files
+        call setline(n, f)
+        let n = n + 1
+    endfor
+
+    if exists("g:MK_sv")
+        call winrestview(g:MK_sv)
+        "unlet g:MK_sv
+    endif
+endfunction
