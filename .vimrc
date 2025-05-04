@@ -5,8 +5,6 @@ let g:netrw_winsize = 25
 let g:netrw_browse_split = 3
 set guioptions-=L
 
-" use it to prevent from losing cursor when netrw open tab and quit.
-let s:MK_restore_count = 0
 
 " ------------ general settings ------------
 set tabstop=4
@@ -123,14 +121,9 @@ augroup coding_group
     autocmd FileType python,tcl,sh setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType vim setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType go setlocal shiftwidth=4 softtabstop=4
-    "autocmd FileType netrw set statusline=%F
     autocmd FileType * call s:SetStatusLine()
     autocmd BufWritePost *.vimrc source %
     autocmd BufWritePre .py,.sh,.tcl,.go silent! :%s/\v\s+$//g
-    " it is not a good event. However, I can't find the right event now.
-    " only windows gvim needs it.
-    autocmd Vimresized * call s:BackToNetrwWindow()
-    "autocmd BufEnter * call s:MK_Browse("")
 augroup END
 
 " for tmux
@@ -167,12 +160,19 @@ endfunction
 
 function! <SID>GetCurrNetrwFile()
     let l:s = expand("%:p") . getline(".")
+
+    if has('win32')
+        let l:s = substitute(l:s, "/", "\\", "")        
+    endif
+
     return l:s
 endfunction
 
 function! s:SetStatusLine()
     if &ft != "netrw"
         execute ":set statusline=%f\\ %=%y[Col:%v][Row:%l/%L]"
+    else
+        execute ":set statusline=%f"
     endif
 endfunction
 execute s:SetStatusLine()
@@ -205,84 +205,83 @@ function! <SID>OpenFileToRight(curr_file)
         let s:MK_sv = winsaveview()
     endif
     
+    let g:MK_curr = getcwd()
     let g:MK_sv = winsaveview()
 
     execute ":vsplit " . a:curr_file
     execute ":normal! " . s:MK_winwidth . "\<C-W>|\<CR>"
 endfunction
 
-function! s:BackToNetrwWindow()
-    "echom "BackToNetrwWindow"
-    if !exists("s:MK_sv") || has("unix")
-        return
-    endif
-    
-    " prevent from opening window many times.
-    let l:count = winnr("$")
-    if l:count != 1 && l:count != 2
-        return
-    endif
-    
-    let s:MK_restore_count += 1
-    call winrestview(s:MK_sv)
 
-    if s:MK_restore_count == 2
-        unlet s:MK_sv
-        let s:MK_restore_count = 0
-    endif
-endfunction
-
-"autocmd FileType netrw nnoremap :q :q!
-"autocmd FileType netrw nnoremap <CR> :call <SID>MK_Enter_Browse(<SID>GetCurrNetrwFile())<CR>
+" for my file explorer
+augroup explorer_group
+    autocmd!
+    autocmd BufEnter * call s:MK_Browse("")
+    "autocmd FileType netrw nnoremap :q :q!
+    autocmd FileType netrw nnoremap <CR> :call <SID>MK_Enter_Browse(<SID>GetCurrNetrwFile())<CR>
+    "autocmd FileType netrw nnoremap i <ESC>
+    "autocmd FileType netrw nnoremap I <ESC>
+    "autocmd FileType netrw nnoremap a <ESC>
+    "autocmd FileType netrw nnoremap A <ESC>
+    "autocmd FileType netrw nnoremap x <ESC>
+	"autocmd FileType netrw nnoremap s <ESC>
+    "autocmd FileType netrw nnoremap y <ESC>
+    "autocmd FileType netrw nnoremap p <ESC>
+augroup END
 
 function! <SID>MK_Enter_Browse(name)
-    echom a:name
     if isdirectory(a:name)
-        let dir = a:name
+        let l:dir = a:name
         if has('win32')
-            let dir = substitute(dir, "/", "\\", "")        
+            let l:dir = substitute(dir, "/", "\\", "")        
         endif
         
-        call chdir(dir)
-        call s:MK_Browse(dir)
+        execute ":e! " . l:dir
     else
+        let g:MK_curr = getcwd()
         let g:MK_sv = winsaveview()
         execute ":tabe " . a:name
     endif
 endfunction
 
 function! s:MK_Browse(dir)
+    " get current directory
     let curr = expand("%:p")
     if a:dir != ""
         let curr = a:dir
     endif
 
+    " not directory, do nothing
     if !isdirectory(curr)
         execute ":set nocursorline"
         return
     endif
-    
+
+    " change folder for later using
     if getcwd() != curr
         call chdir(curr)
     endif
 
+    " set up some options
     execute ":set filetype=netrw"
     execute ":setlocal nonumber"
     execute ":setlocal nowrap"
     execute ":setlocal cursorline"
-    "execute ":setlocal buftype=nofile"
+    execute ":setlocal buftype=nowrite"
     
+    " delete original path structure
     normal! dG
 
     let f_list = readdir(curr, 1)
     let n = 1
 
+    " save paths
     let files = []
     let folders = []
 
     call add(folders, "../")
     call add(folders, "./")
-
+    
     for f in f_list
         if f == ".swp" || f == "_.swp"
             continue
@@ -296,19 +295,27 @@ function! s:MK_Browse(dir)
             call add(files, s)
         endif
     endfor
-
+    
+    " add folders
     for f in folders
         call setline(n, f)
         let n = n + 1
     endfor
     
+    " add files
     for f in files
         call setline(n, f)
         let n = n + 1
     endfor
 
+    " restore previous position
     if exists("g:MK_sv")
-        call winrestview(g:MK_sv)
-        "unlet g:MK_sv
+        if g:MK_curr == getcwd()
+            call winrestview(g:MK_sv)
+            unlet g:MK_sv
+        endif
     endif
+
+    " statusline
+    call s:SetStatusLine()
 endfunction
