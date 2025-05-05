@@ -121,7 +121,7 @@ augroup coding_group
     autocmd FileType python,tcl,sh setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType vim setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType go setlocal shiftwidth=4 softtabstop=4
-    autocmd FileType * call s:SetStatusLine()
+    autocmd WinEnter * call s:SetStatusLine()
     autocmd BufWritePost *.vimrc source %
     autocmd BufWritePre .py,.sh,.tcl,.go silent! :%s/\v\s+$//g
 augroup END
@@ -172,7 +172,7 @@ function! s:SetStatusLine()
     if &ft != "netrw"
         execute ":set statusline=%f\\ %=%y[Col:%v][Row:%l/%L]"
     else
-        execute ":set statusline=%f"
+        execute ":set statusline=%F"
     endif
 endfunction
 execute s:SetStatusLine()
