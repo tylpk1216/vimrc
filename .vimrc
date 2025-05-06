@@ -150,7 +150,8 @@ function! <SID>OpenModuleFile()
 
     execute ":tabe " . l:fname . ".v"
     normal! p
-    execute ":set syntax=verilog"
+    execute ":setlocal syntax=verilog"
+    execute ":setlocal buftype=nowrite"
 endfunction
 
 function! <SID>SetColorColumn()
