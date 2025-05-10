@@ -170,7 +170,7 @@ function! s:SetStatusLine()
     if &ft != "netrw"
         execute ":set statusline=%f\\ %=%y[Col:%v][Row:%l/%L]"
     else
-        execute ":set statusline=%f"
+        execute ":set statusline=[%F]"
     endif
 endfunction
 execute s:SetStatusLine()
@@ -251,7 +251,6 @@ function! s:MK_Browse(dir)
 
     " not directory, do nothing
     if !isdirectory(curr)
-        execute ":set nocursorline"
         return
     endif
 
