@@ -27,11 +27,9 @@ nnoremap <leader>m <C-b>
 nnoremap <leader>sh :set syntax=sh<CR>
 nnoremap <leader>gf <C-w>gf
 " select, search word
-nnoremap <leader>fw viwy /<C-r><S-"><CR>
 nnoremap <leader>mo <S-v>/endmodule<CR>y :call <SID>OpenModuleFile()<CR>
 nnoremap <leader>cc :call <SID>SetColorColumn()<CR>
 nnoremap <leader>dc :set colorcolumn=0<CR>
-nnoremap <leader>fm :Vex<CR>
 nnoremap <leader>o :call <SID>OpenFileToRight(<SID>GetCurrNetrwFile())<CR>
 nnoremap <leader>h gT
 nnoremap <leader>l gt
@@ -50,7 +48,7 @@ else
 endif
 
 " max gui window
-au GUIEnter * simalt ~x
+autocmd GUIEnter * simalt ~x
 
 " status line
 set laststatus=2
@@ -121,7 +119,7 @@ augroup coding_group
     autocmd FileType python,tcl,sh setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType vim setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType go setlocal shiftwidth=4 softtabstop=4
-    autocmd WinEnter * call s:SetStatusLine()
+    autocmd FileType * call s:SetStatusLine()
     autocmd BufWritePost *.vimrc source %
     autocmd BufWritePre .py,.sh,.tcl,.go silent! :%s/\v\s+$//g
 augroup END
@@ -150,8 +148,7 @@ function! <SID>OpenModuleFile()
 
     execute ":tabe " . l:fname . ".v"
     normal! p
-    execute ":setlocal syntax=verilog"
-    execute ":setlocal buftype=nowrite"
+    execute ":set syntax=verilog"
 endfunction
 
 function! <SID>SetColorColumn()
@@ -173,7 +170,7 @@ function! s:SetStatusLine()
     if &ft != "netrw"
         execute ":set statusline=%f\\ %=%y[Col:%v][Row:%l/%L]"
     else
-        execute ":set statusline=%F"
+        execute ":set statusline=%f"
     endif
 endfunction
 execute s:SetStatusLine()
@@ -218,8 +215,8 @@ endfunction
 augroup explorer_group
     autocmd!
     autocmd BufEnter * call s:MK_Browse("")
-    "autocmd FileType netrw nnoremap :q :q!
     autocmd FileType netrw nnoremap <CR> :call <SID>MK_Enter_Browse(<SID>GetCurrNetrwFile())<CR>
+    autocmd FileType netrw nnoremap - gg :call <SID>MK_Enter_Browse(<SID>GetCurrNetrwFile())<CR>
     "autocmd FileType netrw nnoremap i <ESC>
     "autocmd FileType netrw nnoremap I <ESC>
     "autocmd FileType netrw nnoremap a <ESC>
@@ -284,7 +281,8 @@ function! s:MK_Browse(dir)
     call add(folders, "./")
     
     for f in f_list
-        if f == ".swp" || f == "_.swp"
+        let i = stridx(f, ".swp")
+        if i != -1
             continue
         endif
 
