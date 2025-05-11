@@ -217,6 +217,7 @@ augroup explorer_group
     autocmd BufEnter * call s:MK_Browse("")
     autocmd FileType netrw nnoremap <CR> :call <SID>MK_Enter_Browse(<SID>GetCurrNetrwFile())<CR>
     autocmd FileType netrw nnoremap - gg :call <SID>MK_Enter_Browse(<SID>GetCurrNetrwFile())<CR>
+    autocmd FileType netrw nnoremap D :call <SID>MK_Delete_Browse_Item(<SID>GetCurrNetrwFile())<CR>
     "autocmd FileType netrw nnoremap i <ESC>
     "autocmd FileType netrw nnoremap I <ESC>
     "autocmd FileType netrw nnoremap a <ESC>
@@ -316,4 +317,14 @@ function! s:MK_Browse(dir)
 
     " statusline
     call s:SetStatusLine()
+endfunction
+
+function! <SID>MK_Delete_Browse_Item(curr)
+    let res = delete(a:curr)
+    let msg = " failed"
+    if res == 0
+        let msg = " successfully"
+    endif
+    echo "Delete " . a:curr . msg
+    execute ":e"
 endfunction
