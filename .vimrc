@@ -13,6 +13,7 @@ set title
 set showcmd
 set backspace=indent,eol,start
 set splitright
+set cmdheight=2
 "set mouse=a
 
 
@@ -227,13 +228,13 @@ function! Tabline()
         let winnr = tabpagewinnr(tab)
         let buflist = tabpagebuflist(tab)
         let bufnr = buflist[winnr - 1]
-        let bufname = bufname(bufnr)
+        let bufname = fnamemodify(bufname(bufnr), ":t")
         let bufmodified = getbufvar(bufnr, "&mod")
 
         let s .= "%" . tab . "T"
         let s .= (tab == tabpagenr() ? "%#TabLineSel#" : "%#TabLine#")
-        let s .= " " . tab . "."
-        let s .= (bufname != "" ? "[". fnamemodify(bufname, ":t") . "]" : "[No Name]")
+        let s .= " (" . tab . ")"
+        let s .= (bufname != "" ? bufname : "MKTree")
 
         if bufmodified
             let s .= "+ "
@@ -356,6 +357,13 @@ function! s:MK_Browse(dir)
 endfunction
 
 function! <SID>MK_Delete_Browse_Item(curr)
+    let f = fnamemodify(a:curr, ":t")
+    let ok = input("Delete " . f . " (yes/no) : ")
+    if ok != "yes" || ok != "y"
+        execute ":redraw!"
+        return
+    endif
+
     let res = delete(a:curr)
     let msg = " failed"
     if res == 0
