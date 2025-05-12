@@ -3,7 +3,6 @@ let g:netrw_keepdir = 0
 let g:netrw_banner = 0
 let g:netrw_winsize = 25
 let g:netrw_browse_split = 3
-set guioptions-=L
 
 
 " ------------ general settings ------------
@@ -53,6 +52,13 @@ autocmd GUIEnter * simalt ~x
 " status line
 set laststatus=2
 
+" no scrollbar no gui tab
+set guioptions-=L
+set guioptions-=e
+
+" tab line
+set showtabline=2
+
 " adjust theme (ctermbg/guibg)
 if has("unix") && !has("win32unix")
     hi Comment ctermbg=lightgray
@@ -79,6 +85,9 @@ if has("unix") && !has("win32unix")
     hi MKExe ctermfg=lightgreen
     hi Directory ctermfg=lightblue
     hi link netrwExe MKExe
+    
+    " tabline
+    hi TabLineSel ctermbg=lightblue cterm=bold
 else
     hi Comment guibg=#808080
     hi Comment guifg=#0000A0 gui=bold
@@ -104,12 +113,13 @@ else
     " \n
     hi Special guifg=#FF0000
 
-    hi TabLineSet guifg=red
-
     " netrw
     hi MKExe guifg=lightgreen
     hi Directory guifg=#79C0FF gui=bold
     hi link netrwExe MKExe
+    
+    " tabline
+    hi TabLineSel guibg=#79C0FF gui=bold
 endif
 
 
@@ -210,6 +220,32 @@ function! <SID>OpenFileToRight(curr_file)
     execute ":normal! " . s:MK_winwidth . "\<C-W>|\<CR>"
 endfunction
 
+function! Tabline()
+    let s = ""
+    for i in range(tabpagenr("$"))
+        let tab = i + 1
+        let winnr = tabpagewinnr(tab)
+        let buflist = tabpagebuflist(tab)
+        let bufnr = buflist[winnr - 1]
+        let bufname = bufname(bufnr)
+        let bufmodified = getbufvar(bufnr, "&mod")
+
+        let s .= "%" . tab . "T"
+        let s .= (tab == tabpagenr() ? "%#TabLineSel#" : "%#TabLine#")
+        let s .= " " . tab . "."
+        let s .= (bufname != "" ? "[". fnamemodify(bufname, ":t") . "]" : "[No Name]")
+
+        if bufmodified
+            let s .= "+ "
+        endif
+
+        let s .= " "
+    endfor
+    "echo s
+    return s
+endfunction
+set tabline=%!Tabline()
+
 
 " for my file explorer
 augroup explorer_group
@@ -254,7 +290,7 @@ function! s:MK_Browse(dir)
     if !isdirectory(curr)
         return
     endif
-
+    
     " change folder for later using
     if getcwd() != curr
         call chdir(curr)
