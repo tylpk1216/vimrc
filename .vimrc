@@ -7,8 +7,8 @@ let g:netrw_browse_split = 3
 
 " ------------ general settings ------------
 set tabstop=4
-set nu
-set ai
+set number
+set autoindent
 set title
 set showcmd
 set backspace=indent,eol,start
@@ -30,7 +30,6 @@ nnoremap <leader>gf <C-w>gf
 nnoremap <leader>mo <S-v>/endmodule<CR>y :call <SID>OpenModuleFile()<CR>
 nnoremap <leader>cc :call <SID>SetColorColumn()<CR>
 nnoremap <leader>dc :set colorcolumn=0<CR>
-nnoremap <leader>o :call <SID>OpenFileToRight(<SID>GetCurrNetrwFile())<CR>
 nnoremap <leader>h gT
 nnoremap <leader>l gt
 nnoremap nn nzt
@@ -205,6 +204,11 @@ function! s:GetWinWidth()
 endfunction
 
 function! <SID>OpenFileToRight(curr_file)
+    if !filereadable(a:curr_file)
+        execute ":redraw!"
+        return
+    endif
+
     if !has("s:MK_winwidth")
         call s:GetWinWidth()
     endif
@@ -242,7 +246,6 @@ function! Tabline()
 
         let s .= " "
     endfor
-    "echo s
     return s
 endfunction
 set tabline=%!Tabline()
@@ -255,12 +258,13 @@ augroup explorer_group
     autocmd FileType netrw nnoremap <CR> :call <SID>MK_Enter_Browse(<SID>GetCurrNetrwFile())<CR>
     autocmd FileType netrw nnoremap - gg :call <SID>MK_Enter_Browse(<SID>GetCurrNetrwFile())<CR>
     autocmd FileType netrw nnoremap D :call <SID>MK_Delete_Browse_Item(<SID>GetCurrNetrwFile())<CR>
+    autocmd FileType netrw nnoremap <leader>o :call <SID>OpenFileToRight(<SID>GetCurrNetrwFile())<CR>
     "autocmd FileType netrw nnoremap i <ESC>
     "autocmd FileType netrw nnoremap I <ESC>
     "autocmd FileType netrw nnoremap a <ESC>
     "autocmd FileType netrw nnoremap A <ESC>
     "autocmd FileType netrw nnoremap x <ESC>
-	"autocmd FileType netrw nnoremap s <ESC>
+    "autocmd FileType netrw nnoremap s <ESC>
     "autocmd FileType netrw nnoremap y <ESC>
     "autocmd FileType netrw nnoremap p <ESC>
 augroup END
@@ -359,7 +363,7 @@ endfunction
 function! <SID>MK_Delete_Browse_Item(curr)
     let f = fnamemodify(a:curr, ":t")
     let ok = input("Delete " . f . " (yes/no) : ")
-    if ok != "yes" || ok != "y"
+    if ok != "yes" && ok != "y"
         execute ":redraw!"
         return
     endif
