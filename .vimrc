@@ -160,6 +160,7 @@ function! <SID>OpenModuleFile()
     endif
 
     execute ":tabe " . l:fname . ".v"
+    execute ":setlocal buftype=nowrite"
     normal! p
     execute ":set syntax=verilog"
 endfunction
