@@ -1,5 +1,7 @@
 " ------------ global variables ------------
 " for netrw
+" use it to disable netrw
+let g:loaded_netrwPlugin = 1
 let g:netrw_keepdir = 0
 let g:netrw_banner = 0
 let g:netrw_winsize = 25
@@ -282,6 +284,12 @@ function! <SID>MK_Enter_Browse(name)
         
         execute ":e! " . l:dir
     else
+        let l:ok = filereadable(a:name)
+        if !ok
+            execute ":redraw!"
+            return
+        endif
+
         let g:MK_curr = getcwd()
         let g:MK_sv = winsaveview()
         execute ":tabe " . a:name
