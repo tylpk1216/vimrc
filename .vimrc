@@ -1,4 +1,5 @@
 " ------------ global variables ------------
+" for netrw
 let g:netrw_keepdir = 0
 let g:netrw_banner = 0
 let g:netrw_winsize = 25
@@ -26,7 +27,6 @@ nnoremap <leader>n <C-f>
 nnoremap <leader>m <C-b>
 nnoremap <leader>sh :set syntax=sh<CR>
 nnoremap <leader>gf <C-w>gf
-" select, search word
 nnoremap <leader>mo <S-v>/endmodule<CR>y :call <SID>OpenModuleFile()<CR>
 nnoremap <leader>cc :call <SID>SetColorColumn()<CR>
 nnoremap <leader>dc :set colorcolumn=0<CR>
@@ -60,7 +60,7 @@ set guioptions-=e
 set showtabline=2
 
 " adjust theme (ctermbg/guibg)
-if has("unix") && !has("win32unix")
+if has("unix") && !has("win32unix") && !has("gui")
     hi Comment ctermbg=lightgray
     hi Comment ctermfg=black cterm=bold
 
@@ -87,7 +87,8 @@ if has("unix") && !has("win32unix")
     hi link netrwExe MKExe
     
     " tabline
-    hi TabLineSel ctermbg=lightblue cterm=bold
+    hi TabLineSel ctermfg=black ctermbg=lightblue cterm=bold
+    hi TabLine ctermfg=black ctermbg=lightyellow
 else
     hi Comment guibg=#808080
     hi Comment guifg=#0000A0 gui=bold
@@ -119,7 +120,8 @@ else
     hi link netrwExe MKExe
     
     " tabline
-    hi TabLineSel guibg=#79C0FF gui=bold
+    hi TabLineSel guifg=black guibg=#79C0FF gui=bold
+    hi TabLine guifg=black guibg=lightyellow
 endif
 
 
@@ -131,7 +133,8 @@ augroup coding_group
     autocmd FileType go setlocal shiftwidth=4 softtabstop=4
     autocmd FileType * call s:SetStatusLine()
     autocmd BufWritePost *.vimrc source %
-    autocmd BufWritePre .py,.sh,.tcl,.go silent! :%s/\v\s+$//g
+    autocmd BufWritePre *.py,*.tcl,*.sh :%s/\v\s+$//e
+    autocmd BufWritePre *.go :%s/\v\t+$//e
 augroup END
 
 " for tmux
