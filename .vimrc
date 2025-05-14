@@ -49,7 +49,10 @@ else
 endif
 
 " max gui window
-autocmd GUIEnter * simalt ~x
+augroup displaying
+    autocmd!
+    autocmd GUIEnter * simalt ~x
+augroup END
 
 " status line
 set laststatus=2
@@ -276,7 +279,8 @@ augroup explorer_group
 augroup END
 
 function! <SID>MK_Enter_Browse(name)
-    if isdirectory(a:name)
+    let i = stridx(a:name, ".lnk")
+    if isdirectory(a:name) || i != -1
         let l:dir = a:name
         if has('win32')
             let l:dir = substitute(dir, "/", "\\", "")        
