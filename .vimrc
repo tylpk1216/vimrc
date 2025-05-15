@@ -141,7 +141,6 @@ augroup coding_group
     autocmd FileType python,tcl,sh setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType vim setlocal shiftwidth=4 softtabstop=4 expandtab
     autocmd FileType go setlocal shiftwidth=4 softtabstop=4
-    autocmd FileType * call s:SetStatusLine()
     autocmd BufWritePost *.vimrc source %
     autocmd BufWritePre *.py,*.tcl,*.sh :%s/\v\s+$//e
     autocmd BufWritePre *.go :%s/\v\t+$//e
@@ -267,7 +266,7 @@ set tabline=%!Tabline()
 augroup explorer_group
     autocmd!
 if has("win32") || has("win32unix")
-    autocmd BufEnter * call s:MK_Browse("")
+    autocmd BufEnter * call s:MK_Browse()
     autocmd FileType netrw nnoremap <CR> :call <SID>MK_Enter_Browse(<SID>GetCurrNetrwFile())<CR>
     autocmd FileType netrw nnoremap - gg :call <SID>MK_Enter_Browse(<SID>GetCurrNetrwFile())<CR>
     autocmd FileType netrw nnoremap D :call <SID>MK_Delete_Browse_Item(<SID>GetCurrNetrwFile())<CR>
@@ -275,13 +274,20 @@ endif
 augroup END
 
 function! <SID>MK_Enter_Browse(name)
-    let i = stridx(a:name, ".lnk")
-    if isdirectory(a:name) || i != -1
+    let l:i = stridx(a:name, ".lnk")
+    if isdirectory(a:name) || l:i != -1
         let l:dir = a:name
-        if has('win32')
-            let l:dir = substitute(dir, "/", "\\", "")        
+        let l:s = "../"
+        if has("win32")
+            let l:s = "..\\"
         endif
-        
+        " avoid ..\ or C:\..\ 
+        let l:i = stridx(l:dir, l:s)
+        echom l:dir . l:i
+        if l:i == 0 || l:i == 1 || l:i == 3
+            execute ":redraw!"
+            return
+        endif
         execute ":e! " . l:dir
     else
         let l:ok = filereadable(a:name)
@@ -296,12 +302,9 @@ function! <SID>MK_Enter_Browse(name)
     endif
 endfunction
 
-function! s:MK_Browse(dir)
+function! s:MK_Browse()
     " get current directory
     let curr = expand("%:p")
-    if a:dir != ""
-        let curr = a:dir
-    endif
 
     " not directory, do nothing
     if !isdirectory(curr)
@@ -320,6 +323,13 @@ function! s:MK_Browse(dir)
     execute ":setlocal nowrap"
     execute ":setlocal cursorline"
     execute ":setlocal buftype=nowrite"
+
+    if exists("g:MK_buf_id") && bufexists(g:MK_buf_id)
+        execute ":" . g:MK_buf_id . "bdelete!"
+        unlet g:MK_buf_id
+    endif
+    
+    let g:MK_buf_id = bufnr("%")
     
     " delete original path structure
     normal! dG
