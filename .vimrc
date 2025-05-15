@@ -1,7 +1,7 @@
 " ------------ global variables ------------
 " for netrw
 " use it to disable netrw
-if has("win32")
+if has("win32") || has("win32unix")
     let g:loaded_netrwPlugin = 1
 endif
 let g:netrw_keepdir = 0
@@ -243,11 +243,13 @@ function! Tabline()
         let bufnr = buflist[winnr - 1]
         let bufname = fnamemodify(bufname(bufnr), ":t")
         let bufmodified = getbufvar(bufnr, "&mod")
+        let bufft = getbufvar(bufnr, "&filetype")
+        let showname = (bufft == "netrw" ? "Tree" : "New")
 
         let s .= "%" . tab . "T"
         let s .= (tab == tabpagenr() ? "%#TabLineSel#" : "%#TabLine#")
         let s .= " (" . tab . ")"
-        let s .= (bufname != "" ? bufname : "MKTree")
+        let s .= (bufname != "" ? bufname : showname)
 
         if bufmodified
             let s .= "+"
@@ -255,7 +257,7 @@ function! Tabline()
 
         let s .= " "
     endfor
-    let s .= "%#TabLineFill#"
+    let s .= "%#TabLineFill#%T"
     return s
 endfunction
 set tabline=%!Tabline()
@@ -264,7 +266,7 @@ set tabline=%!Tabline()
 " for my file explorer
 augroup explorer_group
     autocmd!
-if has("win32")
+if has("win32") || has("win32unix")
     autocmd BufEnter * call s:MK_Browse("")
     autocmd FileType netrw nnoremap <CR> :call <SID>MK_Enter_Browse(<SID>GetCurrNetrwFile())<CR>
     autocmd FileType netrw nnoremap - gg :call <SID>MK_Enter_Browse(<SID>GetCurrNetrwFile())<CR>
@@ -303,6 +305,7 @@ function! s:MK_Browse(dir)
 
     " not directory, do nothing
     if !isdirectory(curr)
+        call s:SetStatusLine()
         return
     endif
     
