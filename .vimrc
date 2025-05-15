@@ -1,7 +1,9 @@
 " ------------ global variables ------------
 " for netrw
 " use it to disable netrw
-let g:loaded_netrwPlugin = 1
+if has("win32")
+    let g:loaded_netrwPlugin = 1
+endif
 let g:netrw_keepdir = 0
 let g:netrw_banner = 0
 let g:netrw_winsize = 25
@@ -30,6 +32,7 @@ nnoremap <leader>m <C-b>
 nnoremap <leader>sh :set syntax=sh<CR>
 nnoremap <leader>gf <C-w>gf
 nnoremap <leader>mo <S-v>/endmodule<CR>y :call <SID>OpenModuleFile()<CR>
+nnoremap <leader>o :call <SID>OpenFileToRight(<SID>GetCurrNetrwFile())<CR>
 nnoremap <leader>cc :call <SID>SetColorColumn()<CR>
 nnoremap <leader>dc :set colorcolumn=0<CR>
 nnoremap <leader>h gT
@@ -93,6 +96,7 @@ if has("unix") && !has("win32unix") && !has("gui")
     
     " tabline
     hi TabLineSel ctermfg=black ctermbg=lightblue cterm=bold
+    hi TabLineFill ctermfg=black ctermbg=lightyellow
     hi TabLine ctermfg=black ctermbg=lightyellow
 else
     hi Comment guibg=#808080
@@ -126,6 +130,7 @@ else
     
     " tabline
     hi TabLineSel guifg=black guibg=#79C0FF gui=bold
+    hi TabLineFill guifg=black guibg=lightyellow
     hi TabLine guifg=black guibg=lightyellow
 endif
 
@@ -222,11 +227,6 @@ function! <SID>OpenFileToRight(curr_file)
         call s:GetWinWidth()
     endif
     
-    " prevent from opening window many times.
-    if !exists("s:MK_sv")
-        let s:MK_sv = winsaveview()
-    endif
-    
     let g:MK_curr = getcwd()
     let g:MK_sv = winsaveview()
 
@@ -250,11 +250,12 @@ function! Tabline()
         let s .= (bufname != "" ? bufname : "MKTree")
 
         if bufmodified
-            let s .= "+ "
+            let s .= "+"
         endif
 
         let s .= " "
     endfor
+    let s .= "%#TabLineFill#"
     return s
 endfunction
 set tabline=%!Tabline()
@@ -263,19 +264,12 @@ set tabline=%!Tabline()
 " for my file explorer
 augroup explorer_group
     autocmd!
+if has("win32")
     autocmd BufEnter * call s:MK_Browse("")
     autocmd FileType netrw nnoremap <CR> :call <SID>MK_Enter_Browse(<SID>GetCurrNetrwFile())<CR>
     autocmd FileType netrw nnoremap - gg :call <SID>MK_Enter_Browse(<SID>GetCurrNetrwFile())<CR>
     autocmd FileType netrw nnoremap D :call <SID>MK_Delete_Browse_Item(<SID>GetCurrNetrwFile())<CR>
-    autocmd FileType netrw nnoremap <leader>o :call <SID>OpenFileToRight(<SID>GetCurrNetrwFile())<CR>
-    "autocmd FileType netrw nnoremap i <ESC>
-    "autocmd FileType netrw nnoremap I <ESC>
-    "autocmd FileType netrw nnoremap a <ESC>
-    "autocmd FileType netrw nnoremap A <ESC>
-    "autocmd FileType netrw nnoremap x <ESC>
-    "autocmd FileType netrw nnoremap s <ESC>
-    "autocmd FileType netrw nnoremap y <ESC>
-    "autocmd FileType netrw nnoremap p <ESC>
+endif
 augroup END
 
 function! <SID>MK_Enter_Browse(name)
