@@ -199,7 +199,7 @@ endfunction
 execute s:SetStatusLine()
 
 function! s:GetWinWidth()
-    if has("s:MK_winwidth")
+    if exists("s:MK_winwidth")
         return
     endif
 
@@ -222,7 +222,7 @@ function! <SID>OpenFileToRight(curr_file)
         return
     endif
 
-    if !has("s:MK_winwidth")
+    if !exists("s:MK_winwidth")
         call s:GetWinWidth()
     endif
     
@@ -324,12 +324,14 @@ function! s:MK_Browse()
     execute ":setlocal cursorline"
     execute ":setlocal buftype=nowrite"
 
-    if exists("g:MK_buf_id") && bufexists(g:MK_buf_id)
-        execute ":" . g:MK_buf_id . "bdelete!"
+    let curr_buf_id = bufnr("%")
+    if exists("g:MK_buf_id") && bufexists(g:MK_buf_id) && g:MK_buf_id != curr_buf_id
+        "execute ":" . g:MK_buf_id . "bdelete!"
+        execute ":" . g:MK_buf_id . "bwipeout!"
         unlet g:MK_buf_id
     endif
     
-    let g:MK_buf_id = bufnr("%")
+    let g:MK_buf_id = curr_buf_id
     
     " delete original path structure
     normal! dG
