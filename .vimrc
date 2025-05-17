@@ -39,13 +39,15 @@ nnoremap <leader>h gT
 nnoremap <leader>l gt
 nnoremap nn nzt
 
+nnoremap f :call <SID>FindNextAndShowModuleName()<CR>
+
 " ------------ displaying ------------
 syntax on
 set hlsearch
 colorscheme desert
 
 if has("unix")
-    set guifont=Monospace\ 12
+    set guifont=Monospace\ 14
 else
     set termguicolors
     set guifont=Courier_New:h18
@@ -261,6 +263,44 @@ function! Tabline()
 endfunction
 set tabline=%!Tabline()
 
+function GetModuleName()
+    let l:s = ""
+    if exists("s:ModuleName")
+        let l:s = s:ModuleName
+    endif
+    return l:s
+endfunction
+
+function! <SID>FindNextAndShowModuleName()
+    if &ft != "verilog"
+        execute ":redraw!"
+        return
+    endif
+
+    " next
+    normal n
+    normal mn
+    " find module name
+    execute "normal ?module \<CR>|:redraw!"
+    normal mm
+    " get module information
+    let l:n = line(".")
+    let l:s = getline(".")
+    
+    let l:list = matchlist(l:s, '\s*module\s\+\([a-zA-Z0-9_\\\$\[\]]\+\).*')
+    if len(l:list) > 2
+        let s:ModuleName = "Module: " . l:list[1] . " (" . l:n . ")"
+    else
+        let s:ModuleName = "(" . l:n . ")"
+    endif
+    
+    " back to pattern location
+    normal 'n
+    normal $
+    " show information in statusline
+    execute ":set statusline=%{GetModuleName()}"
+endfunction
+
 
 " for my file explorer
 augroup explorer_group
@@ -277,12 +317,8 @@ function! <SID>MK_Enter_Browse(name)
     let l:i = stridx(a:name, ".lnk")
     if isdirectory(a:name) || l:i != -1
         let l:dir = a:name
-        let l:s = "../"
-        if has("win32")
-            let l:s = "..\\"
-        endif
         " avoid ..\ or C:\..\ 
-        let l:i = stridx(l:dir, l:s)
+        let l:i = stridx(l:dir, "..")
         echom l:dir . l:i
         if l:i == 0 || l:i == 1 || l:i == 3
             execute ":redraw!"
