@@ -39,7 +39,13 @@ nnoremap <leader>h gT
 nnoremap <leader>l gt
 nnoremap nn nzt
 
-nnoremap f :call <SID>FindNextAndShowModuleName()<CR>
+" display the module name of variable in verilog file
+nnoremap * *<Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>$
+nnoremap # #<Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>0
+nnoremap / <Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>/
+nnoremap ? <Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>?
+nnoremap f :call <SID>FindNextAndShowModuleName("normal $")<CR>
+nnoremap ff :call <SID>FindNextAndShowModuleName("normal 0")<CR>
 
 " ------------ displaying ------------
 syntax on
@@ -193,7 +199,7 @@ endfunction
 
 function! s:SetStatusLine()
     if &ft != "netrw"
-        execute ":set statusline=%f\\ %=%y[Col:%v][Row:%l/%L]"
+        execute ":set statusline=%t\\ %=%y[Col:%v][Row:%l/%L][%p%%]"
     else
         execute ":set statusline=[%F]"
     endif
@@ -263,6 +269,10 @@ function! Tabline()
 endfunction
 set tabline=%!Tabline()
 
+function! <SID>EmptyString()
+    return ""
+endfunction
+
 function GetModuleName()
     let l:s = ""
     if exists("s:ModuleName")
@@ -271,7 +281,7 @@ function GetModuleName()
     return l:s
 endfunction
 
-function! <SID>FindNextAndShowModuleName()
+function! <SID>FindNextAndShowModuleName(littleMoving)
     if &ft != "verilog"
         execute ":redraw!"
         return
@@ -296,7 +306,8 @@ function! <SID>FindNextAndShowModuleName()
     
     " back to pattern location
     normal 'n
-    normal $
+    "normal $
+    execute a:littleMoving
     " show information in statusline
     execute ":set statusline=%{GetModuleName()}"
 endfunction
