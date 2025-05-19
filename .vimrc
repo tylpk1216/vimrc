@@ -40,12 +40,12 @@ nnoremap <leader>l gt
 nnoremap nn nzt
 
 " display the module name of variable in verilog file
-nnoremap * *<Bar>:call <SID>FindNextAndShowModuleName("normal $", 1)<CR>
-nnoremap # #<Bar>:call <SID>FindNextAndShowModuleName("normal 0", 1)<CR>
+nnoremap * *<Bar>:call <SID>FindNextAndShowModuleName("normal n", 1)<CR>
+nnoremap # #<Bar>:call <SID>FindNextAndShowModuleName("normal N", 1)<CR>
 nnoremap / <Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>/
 nnoremap ? <Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>?
-nnoremap f :call <SID>FindNextAndShowModuleName("normal $", 0)<CR>
-nnoremap ff :call <SID>FindNextAndShowModuleName("normal 0", 0)<CR>
+nnoremap f :call <SID>FindNextAndShowModuleName("normal n", 0)<CR>
+nnoremap ff :call <SID>FindNextAndShowModuleName("normal N", 0)<CR>
 
 " ------------ displaying ------------
 syntax on
@@ -283,24 +283,14 @@ endfunction
 
 function! <SID>FindNextAndShowModuleName(littleMoving, isSpecialCase)
     if &ft != "verilog"
-        " adjust cursor
-        if a:littleMoving == "normal $"
-            normal $
-        else
-            normal 0
-        endif
+        execute a:littleMoving
         execute ":redraw!"
         return
     endif
     
     " calling by *, #
     if a:isSpecialCase
-        " search module case
-        if stridx(getline("."), "module ") != -1
-            return
-        endif
-        
-        if a:littleMoving == "normal $"
+        if a:littleMoving == "normal n"
             normal k
         else
             normal j
@@ -310,9 +300,15 @@ function! <SID>FindNextAndShowModuleName(littleMoving, isSpecialCase)
     " next
     normal n
     normal mn
+    let l:position = winsaveview()
+    
     " find module name
-    execute "normal ?module \<CR>|:redraw!"
+    " line is in the line of module name
+    if stridx(getline("."), "module ") == -1
+        execute "normal ?module \<CR>|:redraw!"
+    endif
     normal mm
+    
     " get module information
     let l:n = line(".")
     let l:s = getline(".")
@@ -326,7 +322,8 @@ function! <SID>FindNextAndShowModuleName(littleMoving, isSpecialCase)
     
     " back to pattern location
     normal 'n
-    execute a:littleMoving
+    call winrestview(l:position)
+    
     " show information in statusline
     execute ":set statusline=%{GetModuleName()}"
 endfunction
