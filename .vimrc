@@ -40,12 +40,12 @@ nnoremap <leader>l gt
 nnoremap nn nzt
 
 " display the module name of variable in verilog file
-nnoremap * *<Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>$
-nnoremap # #<Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>0
+nnoremap * *<Bar>:call <SID>FindNextAndShowModuleName("normal $", 1)<CR>
+nnoremap # #<Bar>:call <SID>FindNextAndShowModuleName("normal 0", 1)<CR>
 nnoremap / <Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>/
 nnoremap ? <Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>?
-nnoremap f :call <SID>FindNextAndShowModuleName("normal $")<CR>
-nnoremap ff :call <SID>FindNextAndShowModuleName("normal 0")<CR>
+nnoremap f :call <SID>FindNextAndShowModuleName("normal $", 0)<CR>
+nnoremap ff :call <SID>FindNextAndShowModuleName("normal 0", 0)<CR>
 
 " ------------ displaying ------------
 syntax on
@@ -281,10 +281,30 @@ function GetModuleName()
     return l:s
 endfunction
 
-function! <SID>FindNextAndShowModuleName(littleMoving)
+function! <SID>FindNextAndShowModuleName(littleMoving, isSpecialCase)
     if &ft != "verilog"
+        " adjust cursor
+        if a:littleMoving == "normal $"
+            normal $
+        else
+            normal 0
+        endif
         execute ":redraw!"
         return
+    endif
+    
+    " calling by *, #
+    if a:isSpecialCase
+        " search module case
+        if stridx(getline("."), "module ") != -1
+            return
+        endif
+        
+        if a:littleMoving == "normal $"
+            normal k
+        else
+            normal j
+        endif
     endif
 
     " next
@@ -306,7 +326,6 @@ function! <SID>FindNextAndShowModuleName(littleMoving)
     
     " back to pattern location
     normal 'n
-    "normal $
     execute a:littleMoving
     " show information in statusline
     execute ":set statusline=%{GetModuleName()}"
