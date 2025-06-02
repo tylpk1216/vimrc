@@ -39,13 +39,16 @@ nnoremap <leader>h gT
 nnoremap <leader>l gt
 nnoremap nn nzt
 
-" display the module name of variable in verilog file
-nnoremap * *<Bar>:call <SID>FindNextAndShowModuleName("normal n", 1)<CR>
-nnoremap # #<Bar>:call <SID>FindNextAndShowModuleName("normal N", 1)<CR>
-nnoremap / <Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>/
-nnoremap ? <Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>?
-nnoremap f :call <SID>FindNextAndShowModuleName("normal n", 0)<CR>
-nnoremap ff :call <SID>FindNextAndShowModuleName("normal N", 0)<CR>
+augroup verilog_function_group
+    autocmd!
+    " display the module name of variable in verilog file
+    nnoremap * *<Bar>:call <SID>FindNextAndShowModuleName("normal n", 1)<CR>
+    nnoremap # #<Bar>:call <SID>FindNextAndShowModuleName("normal N", 1)<CR>
+    nnoremap / <Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>/
+    nnoremap ? <Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>?
+    nnoremap f :call <SID>FindNextAndShowModuleName("normal n", 0)<CR>
+    nnoremap ff :call <SID>FindNextAndShowModuleName("normal N", 0)<CR>
+augroup END
 
 " ------------ displaying ------------
 syntax on
