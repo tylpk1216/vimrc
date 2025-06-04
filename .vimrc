@@ -19,6 +19,7 @@ set showcmd
 set backspace=indent,eol,start
 set splitright
 set cmdheight=2
+set foldmethod=indent
 "set mouse=a
 
 
@@ -37,18 +38,22 @@ nnoremap <leader>cc :call <SID>SetColorColumn()<CR>
 nnoremap <leader>dc :set colorcolumn=0<CR>
 nnoremap <leader>h gT
 nnoremap <leader>l gt
+nnoremap <leader>fi :set foldmethod=indent<CR>
+nnoremap <leader>fm :set foldmethod=manual<CR>
 nnoremap nn nzt
+
 
 augroup verilog_function_group
     autocmd!
     " display the module name of variable in verilog file
-    nnoremap * *<Bar>:call <SID>FindNextAndShowModuleName("normal n", 1)<CR>
-    nnoremap # #<Bar>:call <SID>FindNextAndShowModuleName("normal N", 1)<CR>
-    nnoremap / <Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>/
-    nnoremap ? <Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>?
-    nnoremap f :call <SID>FindNextAndShowModuleName("normal n", 0)<CR>
-    nnoremap ff :call <SID>FindNextAndShowModuleName("normal N", 0)<CR>
+    autocmd FileType verilog nnoremap <buffer> * *<Bar>:call <SID>FindNextAndShowModuleName("normal k", 1)<CR>
+    autocmd FileType verilog nnoremap <buffer> # #<Bar>:call <SID>FindNextAndShowModuleName("normal j", 1)<CR>
+    autocmd FileType verilog nnoremap <buffer> / <Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>/
+    autocmd FileType verilog nnoremap <buffer> ? <Bar>:set statusline=%{<SID>EmptyString()}<CR><Bar>:redraw!<CR><Bar>?
+    autocmd FileType verilog nnoremap <buffer> f :call <SID>FindNextAndShowModuleName("normal k", 0)<CR>
+    autocmd FileType verilog nnoremap <buffer> ff :call <SID>FindNextAndShowModuleName("normal j", 0)<CR>
 augroup END
+
 
 " ------------ displaying ------------
 syntax on
@@ -183,6 +188,7 @@ function! <SID>OpenModuleFile()
     execute ":setlocal buftype=nowrite"
     normal! p
     execute ":set syntax=verilog"
+    execute ":set ft=verilog"
 endfunction
 
 function! <SID>SetColorColumn()
@@ -285,19 +291,9 @@ function GetModuleName()
 endfunction
 
 function! <SID>FindNextAndShowModuleName(littleMoving, isSpecialCase)
-    if &ft != "verilog"
-        execute a:littleMoving
-        execute ":redraw!"
-        return
-    endif
-    
     " calling by *, #
     if a:isSpecialCase
-        if a:littleMoving == "normal n"
-            normal k
-        else
-            normal j
-        endif
+        execute a:littleMoving
     endif
 
     " next
@@ -308,7 +304,8 @@ function! <SID>FindNextAndShowModuleName(littleMoving, isSpecialCase)
     " find module name
     " line is in the line of module name
     if stridx(getline("."), "module ") == -1
-        execute "normal ?module \<CR>|:redraw!"
+        "execute "normal ?module \<CR>|:redraw!"
+        execute "normal ?module \<CR>"
     endif
     normal mm
     
