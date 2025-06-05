@@ -40,6 +40,8 @@ nnoremap <leader>h gT
 nnoremap <leader>l gt
 nnoremap <leader>fi :set foldmethod=indent<CR>
 nnoremap <leader>fm :set foldmethod=manual<CR>
+nnoremap <leader>of zR
+nnoremap <leader>cf zM
 nnoremap nn nzt
 
 
