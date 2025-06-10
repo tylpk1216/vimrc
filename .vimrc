@@ -33,24 +33,35 @@ set foldmethod=indent
 let mapleader = ","
 inoremap jk <esc>
 nnoremap t '
+" open vimrc to new tab
 nnoremap <leader>ev :call <SID>OpenFileToRight($MYVIMRC)<CR>
+" next page, previous page
 nnoremap <leader>n <C-f>
 nnoremap <leader>m <C-b>
 nnoremap <leader>sh :set syntax=sh<CR>
+" open the file of cursor to new tab
 nnoremap <leader>gf <C-w>gf
-nnoremap <leader>mo <S-v>/endmodule<CR>y :call <SID>OpenModuleFile()<CR>
+" open new tab with copied codoe of current module
+nnoremap <leader>mo <S-v>/endmodule<CR>y :call <SID>OpenModuleFile(expand("%:p:h"))<CR>
+" save previous file of module code
+nnoremap <leader>wmo :set buftype=""<CR><Bar>:w<CR>
+" open current file of treeview to new tab
 nnoremap <leader>o :call <SID>OpenFileToRight(<SID>GetCurrNetrwFile())<CR>
+" about column
 nnoremap <leader>cc :call <SID>SetColorColumn()<CR>
 nnoremap <leader>dc :set colorcolumn=0<CR>
+" about tab
 nnoremap <leader>h gT
 nnoremap <leader>l gt
+" about foldmethod
 nnoremap <leader>fmi :set foldmethod=indent<CR>
 nnoremap <leader>fmm :set foldmethod=manual<CR>
 nnoremap <leader>of zR
 nnoremap <leader>cf zM
+" open the file explorer based on the path of current file
 nnoremap <leader>fm :call <SID>FileExplorer(expand("%:p:h"))<CR>
+" find next and put it on the top of area
 nnoremap nn nzt
-
 
 augroup verilog_function_group
     autocmd!
@@ -180,7 +191,7 @@ endif
 
 
 " ------------ functions  ------------
-function! <SID>OpenModuleFile()
+function! <SID>OpenModuleFile(dir)
     let l:line = substitute(getline("."), "(", " ", "")
     let l:strs = split(l:line)
 
@@ -193,11 +204,13 @@ function! <SID>OpenModuleFile()
         let l:fname = l:fname . "_"
     endif
 
-    execute ":tabe " . l:fname . ".v"
+    let l:fname = a:dir . "/" . l:fname . ".v"
+
+    execute ":tabe " . l:fname
     execute ":setlocal buftype=nowrite"
     normal! p
     execute ":set syntax=verilog"
-    execute ":set ft=verilog"
+    execute ":set ft=verilog" 
 endfunction
 
 function! <SID>SetColorColumn()
