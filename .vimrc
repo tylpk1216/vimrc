@@ -1,3 +1,9 @@
+" ------------ tmp test ------------
+if has("win32")
+    set shell=C:\\Program\ Files\\Git\\bin\\bash.exe
+endif
+
+
 " ------------ global variables ------------
 " for netrw
 " use it to disable netrw
@@ -38,10 +44,11 @@ nnoremap <leader>cc :call <SID>SetColorColumn()<CR>
 nnoremap <leader>dc :set colorcolumn=0<CR>
 nnoremap <leader>h gT
 nnoremap <leader>l gt
-nnoremap <leader>fi :set foldmethod=indent<CR>
-nnoremap <leader>fm :set foldmethod=manual<CR>
+nnoremap <leader>fmi :set foldmethod=indent<CR>
+nnoremap <leader>fmm :set foldmethod=manual<CR>
 nnoremap <leader>of zR
 nnoremap <leader>cf zM
+nnoremap <leader>fm :call <SID>FileExplorer(expand("%:p:h"))<CR>
 nnoremap nn nzt
 
 
@@ -328,6 +335,11 @@ function! <SID>FindNextAndShowModuleName(littleMoving, isSpecialCase)
     
     " show information in statusline
     execute ":set statusline=%{GetModuleName()}"
+endfunction
+
+function! <SID>FileExplorer(dir)
+    execute ":tabe " . a:dir
+    execute ":tabm 0"
 endfunction
 
 
