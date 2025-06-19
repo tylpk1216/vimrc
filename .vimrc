@@ -1,6 +1,6 @@
 " ------------ tmp test ------------
 if has("win32")
-    set shell=C:\\Program\ Files\\Git\\bin\\bash.exe
+    "set shell=C:\\Program\ Files\\Git\\bin\\bash.exe
 endif
 
 
@@ -44,7 +44,7 @@ nnoremap <leader>gf <C-w>gf
 " open new tab with copied codoe of current module
 nnoremap <leader>mo <S-v>/endmodule<CR>y :call <SID>OpenModuleFile(expand("%:p:h"))<CR>
 " save previous file of module code
-nnoremap <leader>wmo :set buftype=""<CR><Bar>:w<CR>
+nnoremap <leader>wmo :set buftype=""<CR><Bar>:w<CR><Bar>:call <SID>DumpModulePort()<CR>
 " open current file of treeview to new tab
 nnoremap <leader>o :call <SID>OpenFileToRight(<SID>GetCurrNetrwFile())<CR>
 " about column
@@ -199,18 +199,32 @@ function! <SID>OpenModuleFile(dir)
     if len(l:strs) >= 2
         let l:fname = strs[1]
     endif
+   
+    " check file 
+    "if filereadable(l:fname . ".v") == 1
+    "    let l:fname = l:fname . "_"
+    "endif
 
-    if filereadable(l:fname . ".v") == 1
-        let l:fname = l:fname . "_"
-    endif
-
-    let l:fname = a:dir . "/" . l:fname . ".v"
+    let l:fname = a:dir . "/" . l:fname . ".vim.v"
 
     execute ":tabe " . l:fname
     execute ":setlocal buftype=nowrite"
     normal! p
     execute ":set syntax=verilog"
     execute ":set ft=verilog" 
+endfunction
+
+function! <SID>DumpModulePort()
+    let l:fname = expand("%:p")
+
+if has("win32")
+    let l:script = "D:\\5129\\MKProject\\Source\\WorkCode\\VIA\\MKProject\\DFT\\Coding\\python_netlistparser\\print_module_pin.py"
+    if filereadable(l:script) != 1
+        return
+    endif
+    execute ":!python " . l:script . " " . l:fname
+endif
+
 endfunction
 
 function! <SID>SetColorColumn()
@@ -326,8 +340,7 @@ function! <SID>FindNextAndShowModuleName(littleMoving, isSpecialCase)
     " find module name
     " line is in the line of module name
     if stridx(getline("."), "module ") == -1
-        "execute "normal ?module \<CR>|:redraw!"
-        execute "normal ?module \<CR>"
+        execute "normal ?module \<CR>|:redraw!"
     endif
     normal mm
     
