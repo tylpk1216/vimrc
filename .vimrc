@@ -336,7 +336,31 @@ function! <SID>FindNextAndShowModuleName(littleMoving, isSpecialCase)
     normal n
     normal mn
     let l:position = winsaveview()
-    
+   
+    " is in instance syntax?
+    let l:line = getline(".")
+    let l:s = expand("<cword>")
+    " example: .A(A)
+    let l:pattern = "(.*" . l:s . ".*)"
+    let l:res = match(l:line, l:pattern)
+    let l:inst_name = "no"
+    let l:inst_n = -1
+    if l:res != -1
+        execute "normal /;\<CR>|j|^"
+        execute "normal ?)\<CR>"
+        normal %
+        " get instance name
+        normal mi
+        let l:inst_n = line(".")
+        let l:s = getline(".")
+        let l:list = matchlist(l:s, '\s*\([a-zA-Z0-9_\\\$\[\]]\+\)\s\+.*')
+        if len(l:list) > 2
+            let l:inst_name = l:list[1]
+        endif
+        " back to original position
+        normal 'n
+    endif
+
     " find module name
     " line is in the line of module name
     if stridx(getline("."), "module ") == -1
@@ -353,6 +377,11 @@ function! <SID>FindNextAndShowModuleName(littleMoving, isSpecialCase)
         let s:ModuleName = "Module: " . l:list[1] . " (" . l:n . ")"
     else
         let s:ModuleName = "(" . l:n . ")"
+    endif
+
+    "append instacne info
+    if l:inst_n != -1
+        let s:ModuleName = s:ModuleName . ", instance: " . l:inst_name . " (" . l:inst_n . ")"
     endif
     
     " back to pattern location
