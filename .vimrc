@@ -326,6 +326,30 @@ function GetModuleName()
     return l:s
 endfunction
 
+function! IsInstanceSyntaxByRegex()
+    let l:line = getline(".")
+    let l:s = expand("<cword>")
+    " example: .A(A)
+    let l:pattern = "(.*" . l:s . ".*)"
+    return match(l:line, l:pattern)
+endfunction
+
+function! IsInstanceSyntaxBySearchString()
+    let l:line = getline(".")
+    let l:count = 0
+    let chars = [".", "(", ")"]
+    for char in chars
+        if stridx(l:line, char) != -1
+            let l:count = l:count + 1
+        endif
+    endfor
+
+    if l:count == 0
+        return -1
+    endif
+    return 1
+endfunction
+
 function! <SID>FindNextAndShowModuleName(littleMoving, isSpecialCase)
     " calling by *, #
     if a:isSpecialCase
@@ -338,14 +362,9 @@ function! <SID>FindNextAndShowModuleName(littleMoving, isSpecialCase)
     let l:position = winsaveview()
    
     " is in instance syntax?
-    let l:line = getline(".")
-    let l:s = expand("<cword>")
-    " example: .A(A)
-    let l:pattern = "(.*" . l:s . ".*)"
-    let l:res = match(l:line, l:pattern)
     let l:inst_name = "no"
     let l:inst_n = -1
-    if l:res != -1
+    if IsInstanceSyntaxBySearchString() != -1
         execute "normal /;\<CR>|j|^"
         execute "normal ?)\<CR>"
         normal %
