@@ -375,6 +375,10 @@ function! <SID>FindNextAndShowModuleName(littleMoving, isSpecialCase)
         let l:list = matchlist(l:s, '\s*\([a-zA-Z0-9_\\\$\[\]]\+\)\s\+.*')
         if len(l:list) > 2
             let l:inst_name = l:list[1]
+            " extra check because IsInstanceSyntaxBySearchString is not good enough now.
+            if l:inst_name == "module"
+                let l:inst_n = -1
+            endif
         endif
         " back to original position
         normal 'n
