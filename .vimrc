@@ -25,7 +25,7 @@ set showcmd
 set backspace=indent,eol,start
 set splitright
 set cmdheight=2
-set foldmethod=indent
+"set foldmethod=indent
 "set mouse=a
 
 
@@ -318,7 +318,7 @@ function! <SID>EmptyString()
     return ""
 endfunction
 
-function GetModuleName()
+function! GetModuleName()
     let l:s = ""
     if exists("s:ModuleName")
         let l:s = s:ModuleName
